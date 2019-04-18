@@ -42,7 +42,9 @@ let vue_app = new Vue({
                 large: 0
             }
         },
-        showOutput: false
+        showOutput: false,
+        showError: false,
+        errormessage: ""
     },
     computed: {
         unit: function () {
@@ -100,6 +102,8 @@ let vue_app = new Vue({
                         this.cost.ores[key] += awaken_info.ores[key];
                     });
                 }
+            } else {
+                this.showError = true;
             }
         },
         getSum(costs, evolution_cost) {
@@ -123,17 +127,17 @@ let vue_app = new Vue({
         },
         checkValidInput: function() {
             if (this.evolution.current < this.unit.unlock_stars) {
-                console.log("cannot set a lower initial evolution level than the unlock level")
+                this.errormessage = "Cannot start at an evolution below natural rarity.";
                 return false;
             }
             
             if (this.evolution.desired < this.evolution.current) {
-                console.log('cannot "un-evolve"')
+                this.errormessage = 'Cannot "un-evolve".'
                 return false;
             }
 
             if (this.evolution.current == this.evolution.desired && this.upgrades.desired < this.upgrades.current) {
-                console.log("cannot lose upgrades");
+                this.errormessage ="Cannot lose upgrades.";
                 return false;
             }
 

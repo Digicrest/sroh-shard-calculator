@@ -18,6 +18,21 @@
 
 <body>
     <v-app id="app" class="container" data-app>
+        <v-snackbar
+            v-model="showError"
+            top
+            right
+          >
+            {{ errormessage }}
+            <v-btn
+              color="pink"
+              flat
+              @click="snackbar = false"
+            >
+              Close
+            </v-btn>
+          </v-snackbar>
+
         <v-container>
             <!-- Searchbar -->
             <v-layout row wrap justify-center>
@@ -35,7 +50,7 @@
                     </v-chip>
                 </v-flex>
             </v-layout>
-
+            <img src="images/floating-hex.png" alt="" id="floating">
             <br>
 
             <!-- Unit Image -->
@@ -117,8 +132,7 @@
             <br>
 
             <!-- Output -->
-            <v-layout v-show="showOutput" wrap justify-center style="width: 70%; margin: auto;">
-
+            <v-layout id="output" v-show="showOutput" wrap justify-center style="width: 70%; margin: auto;">
                 <!-- Shard Image -->
                 <v-flex xs12 sm8 md4 style="position: relative;">
                     <img style="width: 50%; margin-left: 25%;" :src='"./images/units/" + unit.name + ".png"'>
