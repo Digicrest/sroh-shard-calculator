@@ -52,11 +52,10 @@ let vue_app = new Vue({
         },
         unit_list: function () {
             return this.all_units
-                .filter(unit => unit.name.toLowerCase().includes("ember"))
-                // .filter(unit => unit.name.toLowerCase().includes(this.filters.search.toLowerCase()))
-                // .filter(unit => this.filters.role ? unit.role.toLowerCase() == this.filters.role.toLowerCase() : unit)
-                // .filter(unit => this.filters.element ? unit.element.toLowerCase() == this.filters.element.replace(/\s+/g, '').toLowerCase() : unit)
-                // .filter(unit => this.filters.rarity ? unit.unlock_stars === this.filters.rarity.length : unit)
+                .filter(unit => unit.name.toLowerCase().includes(this.filters.search.toLowerCase()))
+                .filter(unit => this.filters.role ? unit.role.toLowerCase() == this.filters.role.toLowerCase() : unit)
+                .filter(unit => this.filters.element ? unit.element.toLowerCase() == this.filters.element.replace(/\s+/g, '').toLowerCase() : unit)
+                .filter(unit => this.filters.rarity ? unit.unlock_stars === this.filters.rarity.length : unit)
         }
     },
     methods: {
