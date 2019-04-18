@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SROH Shard Calculator</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="description" content="Check how many shards you need for a unit in Skylanders:ROH" />
+
+    <!-- Vuetify + Icons-->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+    <v-app id="app" class="container" data-app>
+        <v-container>
+            <!-- Searchbar -->
+            <v-layout row wrap justify-center>
+                <v-flex xs12 lg6>
+                    <v-text-field v-model="filters.search"
+                        @input="unit_list.length ? selectUnit(unit_list[0].name) : ''" :placeholder='unit.name + " ..."'
+                        counter autofocus prepend-inner-icon="search" color="purple"></v-text-field>
+                </v-flex>
+                <br>
+                <v-flex xs12 text-xs-center>
+                    <v-chip v-if="unit_list.length > 1" v-on:click="selectUnit(unit.name)"
+                        v-for="(unit, index) in (unit_list.length > 2 ? unit_list.slice(0, 3) : unit_list)" :key="index"
+                        outline color="green">
+                        {{ unit.name }}
+                    </v-chip>
+                </v-flex>
+            </v-layout>
+
+            <br>
+
+            <!-- Unit Image -->
+            <v-layout justify-center>
+                <v-flex xs6 sm3 lg2 xl1 style="position: relative;">
+                    <img style="margin-left: 12.5%;" id="element-icon" class="absolute"
+                        :src='"./images/elements/" + unit.element + ".png"'>
+                    <img style="width: 75%; margin-left: 12.5%;" :src='"./images/units/" + unit.name + ".png"'>
+                    <img style="width: 75%; margin-left: 12.5%;" class="absolute"
+                        :src='"./images/borders/" + unit.unlock_stars + ".png"'>
+                    <v-rating style="width: 90%; margin-left: 25%; transform: skewX(-15deg)" small readonly dense
+                        color="orange" v-model="unit.unlock_stars"></v-rating>
+                </v-flex>
+            </v-layout>
+
+            <h2 class=".display-3" style="width: fit-content; margin: auto; margin-top: 2px;">{{ unit.name }}</h2>
+            <br>
+
+            <!-- User Input Controls -->
+            <v-layout wrap justify-center style="margin-bottom: 30px;">
+                <!-- Current Unit State -->
+                <v-flex xs12 sm5 class="section">
+                    <v-layout wrap justify-center text-xs-center style="padding: 10px;">
+                        <v-flex xs12>
+                            <h2>From</h2>
+                        </v-flex>
+
+                        <v-flex xs12>
+                            <v-slider v-model="upgrades.current" color="blue" :max="5"
+                                :tick-labels="['0', '+1', '+2', '+3', '+4', '+5']" ticks="always" tick-size="0">
+                            </v-slider>
+                        </v-flex>
+
+                        <v-flex xs12>
+                            <v-rating v-model="evolution.current" v-if="!already_awakened" hover dense color="#FFD700"
+                                length="6"></v-rating>
+                            <v-rating v-model="evolution.current" v-else hover dense color="purple" length="6">
+                            </v-rating>
+                        </v-flex>
+
+                        <v-flex v-if="unit.category !== 'Villain'" xs12 style="margin-top:10px">
+                            <v-switch v-model="already_awakened" label="Awakened" color="purple" value="Awakened"
+                                hide-details></v-switch>
+                        </v-flex>
+                    </v-layout>
+                </v-flex>
+
+                <!-- Goal Unit State -->
+                <v-flex xs12 sm5 class="section">
+                    <v-layout row wrap justify-center text-xs-center style="padding: 10px;">
+                        <v-flex xs12>
+                            <h2>To</h2>
+                        </v-flex>
+
+                        <v-flex xs12>
+                            <v-slider v-model="upgrades.desired" color="blue" ticks="always" tick-size="0"
+                                :tick-labels="['0', '+1', '+2', '+3', '+4', '+5']" :max="5">
+                            </v-slider>
+                        </v-flex>
+
+                        <v-flex xs12>
+                            <v-rating v-model="evolution.desired" v-if="already_awakened || will_awaken" hover dense color="purple" length="6">
+                            </v-rating>
+                            <v-rating v-model="evolution.desired" v-else hover dense color="#FFD700" length="6"></v-rating>
+                        </v-flex>
+
+                        <v-flex v-if="unit.category !== 'Villain'" justify-center xs12 v-if="!already_awakened">
+                            <v-switch v-model="will_awaken" label="Awaken" color="purple" value="Awaken" hide-details>
+                            </v-switch>
+                        </v-flex>
+                    </v-layout>
+                </v-flex>
+            </v-layout>
+
+            <!-- Go Button -->
+            <v-btn v-on:click="calculate" block dark color="info" active-class="success" v-model="showOutput">
+                <i class="material-icons">polymer</i>
+            </v-btn>
+            <br>
+
+            <!-- Output -->
+            <v-layout v-show="showOutput" wrap justify-center style="width: 70%; margin: auto;">
+
+                <!-- Shard Image -->
+                <v-flex xs12 sm8 md4 style="position: relative;">
+                    <img style="width: 50%; margin-left: 25%;" :src='"./images/units/" + unit.name + ".png"'>
+                    <img style="width: 50%; margin-left: 25%;" class="absolute" :src='"./images/borders/" + unit.unlock_stars + ".png"'>
+                    <p style="text-align: center" class="headline">{{ cost.shards }}</p>
+                </v-flex>
+
+                 <!-- Gold -->
+                <v-flex xs4 sm4 md2 style="margin-left: -10%; margin-top:10%;">
+                    <img style="width: 50%; margin-left: 25%;" src="./images/materials/gold.png">
+                    <p style="text-align: center">{{ cost.gold }}</p>
+                </v-flex>
+
+                <!-- Materials -->
+                <v-flex xs8 sm8 md6>
+                    <!-- Elixir -->
+                    <div style="display: flex;">
+                        <div>
+                            <img style="width: 100%;" src="./images/materials/elixir/small.png">
+                            <p style="text-align: center">{{ cost.elixirs.small }}</p>
+                        </div>
+
+                        <div style="margin: 0 5px 0 5px;">
+                            <img style="width: 100%;" src="./images/materials/elixir/medium.png">
+                            <p style="text-align: center">{{ cost.elixirs.medium }}</p>
+                        </div>
+
+                        <div>
+                            <img style="width: 100%;" src="./images/materials/elixir/large.png">
+                            <p style="text-align: center">{{ cost.elixirs.large }}</p>
+                        </div>
+                    </div>
+
+                     <!-- Ore -->
+                     <div style="display: flex;">
+                        <div>
+                            <img style="width: 100%;" src="./images/materials/ore/small.png">
+                            <p style="text-align: center">{{ cost.ores.small }}</p>
+                        </div>
+
+                        <div style="margin: 0 5px 0 5px;">
+                            <img style="width: 100%;" src="./images/materials/ore/medium.png">
+                            <p style="text-align: center">{{ cost.ores.medium }}</p>
+                        </div>
+
+                        <div>
+                            <img style="width: 100%;" src="./images/materials/ore/large.png">
+                            <p style="text-align: center">{{ cost.ores.large }}</p>
+                        </div>
+                    </div>
+                </v-flex>
+            </v-layout>
+ 
+            <!-- Expandable Output Table Showing Raw Data -->
+        </v-container>
+    </v-app>
+</body>
+
+<!-- Vue + Vuetify -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+
+<!-- Data -->
+<script src="./data/units.js"></script>
+<script src="./data/upgrade-costs.js"></script>
+<script src="./data/awaken-costs.js"></script>
+
+<!-- App -->
+<script src="./app.js"></script>
+
+</html>
