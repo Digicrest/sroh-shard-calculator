@@ -18,18 +18,10 @@
 
 <body>
     <v-app id="app" class="container" data-app>
-        <v-snackbar
-            v-model="showError"
-            top
-            right
-          >
+        <v-snackbar v-model="showError" top right>
             {{ errormessage }}
-            <v-btn
-              color="pink"
-              flat
-              @click="snackbar = false"
-            >
-              Close
+            <v-btn color="pink" flat @click="showError = false">
+                <i class="material-icons">close</i> Close
             </v-btn>
           </v-snackbar>
 
@@ -133,11 +125,17 @@
 
             <!-- Output -->
             <v-layout id="output" v-show="showOutput" wrap justify-center style="width: 70%; margin: auto;">
+
                 <!-- Shard Image -->
                 <v-flex xs12 sm8 md4 style="position: relative;">
                     <img style="width: 50%; margin-left: 25%;" :src='"./images/units/" + unit.name + ".png"'>
                     <img style="width: 50%; margin-left: 25%;" class="absolute" :src='"./images/borders/" + unit.unlock_stars + ".png"'>
                     <p style="text-align: center" class="headline">{{ cost.shards }}</p>
+
+                    <p style="font-style: italic; color: firebrick" v-if="unit.unlock_stars === 5 && evolution.desired == 6 && upgrades.desired > 2">
+                        the <a href="https://docs.google.com/spreadsheets/d/1PKlT37IqIt2TVi9eO4fJQb2LOjw9c1h5-lEW5ZUaGE0/edit#gid=242086805">spreadsheet</a> i used for data doesn't have upgrade information for 6* Nat 5s beyond +2.
+                        This information is also missing from <a href="https://chompy.app/db/evolution">Chompy.app</a> so going beyond +2 wont work properly.
+                    </p>
                 </v-flex>
 
                  <!-- Gold -->
