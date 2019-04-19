@@ -77,7 +77,9 @@ let vue_app = new Vue({
                 let totals = [];
 
                 data.forEach(star => {
-                    if (star.current_star === this.evolution.current) {
+                    if((star.current_star === this.evolution.current) && (star.current_star == this.evolution.desired)) {
+                        totals.push(this.getSum(star.costs.upgrade.slice(this.upgrades.current, this.upgrades.desired), { gold: 0, shards: 0}))
+                    } else if (star.current_star === this.evolution.current) {
                         totals.push(this.getSum(star.costs.upgrade.slice(this.upgrades.current), star.costs.evolution))
                     } else if(star.current_star == this.evolution.desired) {
                         totals.push(this.getSum(star.costs.upgrade.slice(0, this.upgrades.desired), star.costs.evolution));
