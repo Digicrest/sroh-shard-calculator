@@ -3,7 +3,7 @@ function setup() {
         unit.rating = 0;
         unit.comment = "";
     })
-    units = units.filter(unit => !unit.name.includes('generic'))
+    units = units.filter(unit => !unit.name.includes('generic') && unit.category !== "Villain")
 }
 setup();
 
@@ -56,6 +56,7 @@ let vue_app = new Vue({
                 .filter(unit => this.filters.role ? unit.role.toLowerCase() == this.filters.role.toLowerCase() : unit)
                 .filter(unit => this.filters.element ? unit.element.toLowerCase() == this.filters.element.replace(/\s+/g, '').toLowerCase() : unit)
                 .filter(unit => this.filters.rarity ? unit.unlock_stars === this.filters.rarity.length : unit)
+                .filter(unit => unit.category !== "Villain")
         }
     },
     methods: {
